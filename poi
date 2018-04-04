@@ -13,7 +13,7 @@ optparser = OptionParser.new do |opts|
 
     opts.banner = "Usage: poi -f [FILE / URL] [-d]"
 
-    opts.on('-f', '--file FILE', 'Generate using .poi file.') do |file|
+    opts.on('-f', '--file FILE / URL', 'Generate using .poi file.') do |file|
         options[:file] = file
     end
 
