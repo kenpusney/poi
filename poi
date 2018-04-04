@@ -7,6 +7,8 @@ require 'json'
 require 'optparse'
 require 'open-uri'
 
+POI_DEFAULTS = ".poi_defaults"
+
 options = {}
 
 optparser = OptionParser.new do |opts|
@@ -21,6 +23,14 @@ optparser = OptionParser.new do |opts|
         options[:delete] = true
     end
 
+    opts.on('-p', '--pack [PACK]', 'Pack .poipack file into .poi') do |pack|
+        options[:pack] = pack || '.poipack'
+    end
+
+    opts.on('-t', '--target TARGET', 'Packaging target') do |target|
+        options[:target] = target
+    end
+
     opts.on('-h', '--help', "Print help message") do 
         options[:help] = true
         puts opts
@@ -28,6 +38,24 @@ optparser = OptionParser.new do |opts|
 end
 
 optparser.parse!
+
+if (options[:pack])
+    target = options[:target] ? File.open(options[:target], "w") : STDOUT
+    if (File.exists?(options[:pack]))
+        File.readlines(options[:pack]).map {|l| l.strip }.map {|l| Dir.glob(l)}.flatten
+            .tap {|fs| fs.insert(0, POI_DEFAULTS) if File.exists?(POI_DEFAULTS) and !fs.include?(POI_DEFAULTS)}
+            .select {|l| l != options[:target]}.each do |l|
+                file = l.strip
+                content = File.readlines(file)
+                target.puts("#{file} #{content.size}")
+                target.puts(content.join) if (!content.empty?)
+                target.puts
+            end
+    end
+    target.puts(".")
+    target.close if target != STDOUT
+    exit
+end
 
 if (!options[:file])
     puts optparser if (!options[:help])
@@ -49,7 +77,7 @@ data = {};
 x = 0;
 
 while lines[x].strip != '.' && x < lines.size do
-    data = JSON.load(File.read(".poi_defaults")) if File.exists? ".poi_defaults"
+    data = JSON.load(File.read(POI_DEFAULTS)) if File.exists? POI_DEFAULTS
     data.merge!(JSON.load(File.read(".poi_vars"))) if File.exists? ".poi_vars"
     line = lines[x].strip
     if (line =~ /^(.+)\s(\d+)$/)
