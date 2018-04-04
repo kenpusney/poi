@@ -1,0 +1,13 @@
+hello.c 5
+#include <stdio.h>
+
+int main() {
+    return printf("hello world");
+}
+
+a/b/c.txt 3
+abc
+def
+ghi
+
+.

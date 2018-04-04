@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+lines = ARGF.readlines
+
+x = 0;
+
+def parents(path)
+    segs = path.split("/")
+    parent_segs = segs[0...-1];
+
+    if (parent_segs.empty?)
+        return "."
+    end
+    return parent_segs.join("/")
+end
+
+while lines[x].strip != '.' && x < lines.size do
+    line = lines[x].strip
+    if (line =~ /^(.+)\s(\d+)$/) 
+        file = $1.strip
+        size = $2.to_i
+        texts = lines[x+1, size]
+        FileUtils.mkdir_p(parents(file))
+        File.open(file, "w") do |f|
+            texts.each do |t|
+                f.puts t
+            end
+        end
+        x += size
+    end
+    x += 1
+end
