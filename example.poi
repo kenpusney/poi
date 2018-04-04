@@ -1,8 +1,13 @@
+.poi_defaults 3
+{
+    "message": "hello world!"
+}
+
 hello.c 5
 #include <stdio.h>
 
 int main() {
-    return printf("hello world");
+    return printf("{{ message }}");
 }
 
 a/b/c.txt 3

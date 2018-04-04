@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'fileutils'
+require 'mustache'
+require 'json'
 
 lines = ARGF.readlines
 
@@ -16,7 +19,11 @@ def parents(path)
     return parent_segs.join("/")
 end
 
+data = {};
+
 while lines[x].strip != '.' && x < lines.size do
+    data = JSON.load(File.read(".poi_defaults")) if File.exists? ".poi_defaults"
+    data.merge!(JSON.load(File.read(".poi_vars"))) if File.exists? ".poi_vars"
     line = lines[x].strip
     if (line =~ /^(.+)\s(\d+)$/) 
         file = $1.strip
@@ -24,9 +31,7 @@ while lines[x].strip != '.' && x < lines.size do
         texts = lines[x+1, size]
         FileUtils.mkdir_p(parents(file))
         File.open(file, "w") do |f|
-            texts.each do |t|
-                f.puts t
-            end
+            f << Mustache.render(texts.join, data)
         end
         x += size
     end
