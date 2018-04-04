@@ -1,8 +1,13 @@
-# POI
+# POI 
 
-![Featured](https://img.shields.io/badge/status-featured-blue.svg) ![Automation](https://img.shields.io/badge/profile-automation-blue.svg) ![Tools](https://img.shields.io/badge/profile-utilities-blue.svg)
+![Gem](https://img.shields.io/gem/v/poi.svg) ![Featured](https://img.shields.io/badge/status-featured-blue.svg) ![Automation](https://img.shields.io/badge/profile-automation-blue.svg) ![Tools](https://img.shields.io/badge/profile-utilities-blue.svg)
 
 POI 是一个简单的用来生成文件夹和文件内容结构的工具。
+
+## 安装
+```
+gem install poi
+```
 
 ## Usage
 
@@ -20,7 +25,7 @@ POI 内部使用 Mustache 作为模板。
 ## 使用方法
 
 ```
-./poi -f <文件名 / URL>
+poi -f <文件名 / URL>
 ```
 
 POI 会根据 `.poi` 定义的文件结构和模板来在当前目录生成定义文件。这样可以简单作为一个项目模板文件等来使用。
@@ -63,7 +68,7 @@ int main() {
 ```bash
 > cat .poipack
 **/**.c
-> ./poi --pack --target c_files.poi
+> poi --pack --target c_files.poi
 ```
 
 ## 模板变量
