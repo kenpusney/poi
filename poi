@@ -4,10 +4,35 @@ require 'rubygems'
 require 'fileutils'
 require 'mustache'
 require 'json'
+require 'optparse'
+require 'open-uri'
 
-lines = ARGF.readlines
+options = {}
 
-x = 0;
+optparser = OptionParser.new do |opts|
+
+    opts.banner = "Usage: poi -f [FILE / URL] [-d]"
+
+    opts.on('-f', '--file FILE', 'Generate using .poi file.') do |file|
+        options[:file] = file
+    end
+
+    opts.on('-d', '--delete', 'Delete all generated file') do 
+        options[:delete] = true
+    end
+
+    opts.on('-h', '--help', "Print help message") do 
+        options[:help] = true
+        puts opts
+    end
+end
+
+optparser.parse!
+
+if (!options[:file])
+    puts optparser if (!options[:help])
+    exit
+end
 
 def parents(path)
     segs = path.split("/")
@@ -19,19 +44,30 @@ def parents(path)
     return parent_segs.join("/")
 end
 
+lines = open(options[:file]).readlines
 data = {};
+x = 0;
 
 while lines[x].strip != '.' && x < lines.size do
     data = JSON.load(File.read(".poi_defaults")) if File.exists? ".poi_defaults"
     data.merge!(JSON.load(File.read(".poi_vars"))) if File.exists? ".poi_vars"
     line = lines[x].strip
-    if (line =~ /^(.+)\s(\d+)$/) 
+    if (line =~ /^(.+)\s(\d+)$/)
         file = $1.strip
         size = $2.to_i
         texts = lines[x+1, size]
-        FileUtils.mkdir_p(parents(file))
-        File.open(file, "w") do |f|
-            f << Mustache.render(texts.join, data)
+        parent = parents(file);
+        FileUtils.mkdir_p(parent)
+        if (options[:delete])
+            File.delete(file) if File.exists?(file)
+            while (parent.size >= 0 && Dir.open(parent).count <= 2) do
+                Dir.delete(parent)
+                parent = parents(parent)
+            end
+        else
+            File.open(file, "w") do |f|
+                f << Mustache.render(texts.join, data)
+            end
         end
         x += size
     end
