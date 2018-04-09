@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'poi/pois'
+
+app = POI::Pois.new
+
+app.run(ARGV)
